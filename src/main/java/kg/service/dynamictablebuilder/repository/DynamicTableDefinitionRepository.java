@@ -10,5 +10,5 @@ import java.util.List;
 public interface DynamicTableDefinitionRepository extends JpaRepository<DynamicTableDefinition, Long> {
     boolean existsByTableName(String tableName);
     DynamicTableDefinition findByTableName(String tableName);
-    List<DynamicTableDefinition> getAll();
+    List<DynamicTableDefinition> findAll();
 }

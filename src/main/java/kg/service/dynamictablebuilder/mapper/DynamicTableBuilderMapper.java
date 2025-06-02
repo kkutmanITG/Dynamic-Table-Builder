@@ -8,12 +8,14 @@ import kg.service.dynamictablebuilder.dto.response.TableResponseColumnSummaryRes
 import kg.service.dynamictablebuilder.exception.exceptions.BadRequestException;
 import kg.service.dynamictablebuilder.model.DynamicColumnDefinition;
 import kg.service.dynamictablebuilder.model.DynamicTableDefinition;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class DynamicTableBuilderMapper {
 
     private static final Map<String, String> columnTypeMapping = new HashMap<>();
@@ -53,6 +55,8 @@ public class DynamicTableBuilderMapper {
             entityColumn.setColumnName(column.getName());
             entityColumn.setColumnType(getColumnType(column.getType()));
             entityColumn.setNullable(column.isNullable());
+
+            columns.add(entityColumn);
         }
 
         return columns;

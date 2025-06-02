@@ -5,6 +5,7 @@ import kg.service.dynamictablebuilder.dto.response.ColumnResponse;
 import kg.service.dynamictablebuilder.dto.response.TableResponse;
 import kg.service.dynamictablebuilder.dto.response.TableResponseColumnSummaryResponse;
 import kg.service.dynamictablebuilder.generator.SqlGenerator;
+import kg.service.dynamictablebuilder.generator.TableCreator;
 import kg.service.dynamictablebuilder.mapper.DynamicTableBuilderMapper;
 import kg.service.dynamictablebuilder.model.DynamicColumnDefinition;
 import kg.service.dynamictablebuilder.model.DynamicTableDefinition;
@@ -13,7 +14,6 @@ import kg.service.dynamictablebuilder.service.DynamicTableBuilderService;
 import kg.service.dynamictablebuilder.validator.TableRequestValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,10 +24,10 @@ import java.util.List;
 public class DynamicTableBuilderServiceImpl implements DynamicTableBuilderService {
 
     private final DynamicTableDefinitionRepository repository;
-    private final JdbcTemplate jdbcTemplate;
 
-    private DynamicTableBuilderMapper mapper;
-    private TableRequestValidator validator;
+    private final DynamicTableBuilderMapper mapper;
+    private final TableRequestValidator validator;
+    private final TableCreator creator;
 
     @Override
     public TableResponse createTable(TableCreatedRequest createDynamicTableRequest) {
@@ -37,9 +37,10 @@ public class DynamicTableBuilderServiceImpl implements DynamicTableBuilderServic
         List<DynamicColumnDefinition> columns = mapper.dtoToEntityColumns(createDynamicTableRequest);
 
         table.setColumns(columns);
+        columns.forEach(column -> column.setTableDefinition(table));
 
         String query = SqlGenerator.generateCreateTableSql(table);
-        jdbcTemplate.update(query);
+        creator.createTable(query);
 
         repository.save(table);
 
@@ -50,6 +51,7 @@ public class DynamicTableBuilderServiceImpl implements DynamicTableBuilderServic
 
         return tableCreatedResponse;
     }
+
 
     @Override
     public TableResponse findByName(String tableName) {

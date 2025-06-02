@@ -2,15 +2,18 @@ package kg.service.dynamictablebuilder.validator;
 
 import kg.service.dynamictablebuilder.dto.request.ColumnCreatedRequest;
 import kg.service.dynamictablebuilder.dto.request.TableCreatedRequest;
+import kg.service.dynamictablebuilder.exception.exceptions.BadRequestException;
 import kg.service.dynamictablebuilder.repository.DynamicTableDefinitionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Component
 @RequiredArgsConstructor
 public class TableRequestValidator {
     private static final Set<String> SUPPORTED_TYPES = Set.of(
@@ -68,13 +71,13 @@ public class TableRequestValidator {
                 throw badRequest("Имена колонок должны быть уникальными. Повтор: '" + colName + "'");
             }
 
-            if ((colType == null || colType.isEmpty()) || !SUPPORTED_TYPES.contains(colType)) {
+            if ((colType == null || colType.isEmpty()) || !SUPPORTED_TYPES.contains(colType.toUpperCase())) {
                 throw badRequest("Тип колонки '" + colType + "' не поддерживается. Допустимые типы: " + SUPPORTED_TYPES);
             }
         }
     }
 
-    private ResponseStatusException badRequest(String message) {
-        return new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+    private BadRequestException badRequest(String message) {
+        return new BadRequestException(message);
     }
 }
